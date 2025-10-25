@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>SDGs 期末報告選題器</title>
+  <style>
+    body {font-family: 'Noto Sans TC', sans-serif; background-color: #0f172a; color: #e5e7eb; margin: 0; padding: 20px;}
+    h1 {text-align: center;}
+    .container {max-width: 800px; margin: auto; background: #1e293b; padding: 20px; border-radius: 10px;}
+    label {font-weight: bold; display: block; margin-top: 20px;}
+    select, button {width: 100%; padding: 10px; border-radius: 6px; border: none; margin-top: 5px;}
+    select {background: #0b1324; color: #e5e7eb;}
+    button {background: #22d3ee; color: #0f172a; font-weight: bold; cursor: pointer;}
+    button:hover {background: #06b6d4;}
+    .targets {margin-top: 10px;}
+    .targets label {display: block; margin-bottom: 5px; cursor: pointer;}
+    .output {margin-top: 20px; background: #0b1324; padding: 15px; border-radius: 8px; white-space: pre-wrap;}
+  </style>
+</head>
+<body>
+  <h1>SDGs 期末報告選題器</h1>
+  <div class="container">
+    <label for="sdgSelect">第一大項：選擇 SDG 主目標</label>
+    <select id="sdgSelect"></select>
+
+    <label>第二層：選擇細項目標（可複選，建議 2 個）</label>
+    <div id="targetsList" class="targets"></div>
+
+    <div class="output" id="output">請選擇主目標與細項。</div>
+  </div>
+
+  <script>
+    const sdgData = {
+      1: {title: '消除貧窮', targets: ['終結極端貧窮','至少減少50%的貧窮','實施社會保障制度','所有權、基本服務、技術和經濟資源取得權利的平等','建立具韌性面對環境、經濟和社會災難的能力','調動資源以實施脫貧政策','建立有利於窮人和對性別問題敏感的政策框架']},
+      2: {title: '終結飢餓', targets: ['普遍獲得安全和營養的糧食','結束一切形式的營養不良','使小規模食品生產商的生產率和收入增加一倍','永續糧食生產和彈性農業作法','保持糧食生產中的基因多樣性','投資農村基礎設施、農業研究、科技和基因銀行','防止農業貿易限制、市場扭曲和出口補貼','確保穩定的糧食商品市場和及時獲得資訊']},
+      3: {title: '健康與福祉', targets: ['降低孕產婦死亡率','終結5歲以下所有可預防的死亡','對抗傳染病','減少非傳染性疾病造成的死亡率並促進心理健康','預防和治療物質濫用','減少道路傷害和死亡','普遍獲得性保健和生殖保健，計劃生育和教育','實現全民健康覆蓋','減少有害化學物質和污染造成的疾病和死亡','實施《世界衛生組織煙草控制框架公約》','支持對負擔得起的疫苗和藥品的研究、開發和普遍使用','增加發展中國家的衛生籌資和支持衛生人力','完善全球健康風險預警系統']}
+    };
+
+    const sdgSelect = document.getElementById('sdgSelect');
+    const targetsList = document.getElementById('targetsList');
+    const output = document.getElementById('output');
+
+    Object.entries(sdgData).forEach(([key, val]) => {
+      const option = document.createElement('option');
+      option.value = key;
+      option.textContent = `SDG${key}｜${val.title}`;
+      sdgSelect.appendChild(option);
+    });
+
+    function renderTargets() {
+      const selected = sdgSelect.value;
+      const targets = sdgData[selected]?.targets || [];
+      targetsList.innerHTML = '';
+      targets.forEach((t, i) => {
+        const label = document.createElement('label');
+        label.innerHTML = `<input type='checkbox' value='${t}'> ${t}`;
+        targetsList.appendChild(label);
+      });
+    }
+
+    function updateOutput() {
+      const sdgNum = sdgSelect.value;
+      const checks = targetsList.querySelectorAll('input[type="checkbox"]:checked');
+      const picks = Array.from(checks).map(chk => `「${chk.value}」`).join(' ');
+      if (!picks) {
+        output.textContent = '請先選擇細項。';
+        return;
+      }
+      const count = checks.length === 1 ? '一個' : checks.length === 2 ? '兩個' : `${checks.length}個`;
+      output.textContent = `「SDG${sdgNum}」在企業主要應用，以${picks} ${count}細項為主軸來探討。`;
+    }
+
+    sdgSelect.addEventListener('change', renderTargets);
+    targetsList.addEventListener('change', updateOutput);
+
+    renderTargets();
+  </script>
+</body>
+</html>
